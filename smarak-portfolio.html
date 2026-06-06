@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smarak Bhandari — Portfolio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg: #080508;
+  --deep: #0d060a;
+  --surface: #110a0e;
+  --panel: #180d12;
+  --red: #c0162a;
+  --red-bright: #e8192f;
+  --red-glow: #ff2040;
+  --red-dim: #6b0d18;
+  --red-mist: rgba(192,22,42,0.08);
+  --gold: #c9973a;
+  --text: #f5e8ea;
+  --muted: #7a5560;
+  --border: rgba(192,22,42,0.2);
+  --border-bright: rgba(232,25,47,0.5);
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── CURSOR ── */
+#cur { position:fixed;width:10px;height:10px;background:var(--red-bright);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;transition:transform .1s; }
+#cur-ring { position:fixed;width:32px;height:32px;border:1px solid rgba(232,25,47,.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .14s ease; }
+
+/* ── CANVAS ── */
+#bg-canvas { position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none; }
+
+/* ── NOISE OVERLAY ── */
+body::before {
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── LOADER ── */
+#loader {
+  position:fixed;inset:0;background:var(--bg);z-index:10000;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity .9s ease;
+}
+#loader.out{opacity:0;pointer-events:none;}
+.loader-name{font-family:'Cinzel',serif;font-size:3rem;letter-spacing:.3em;color:var(--red-bright);text-shadow:0 0 40px var(--red);}
+.loader-bar{width:260px;height:1px;background:var(--border);position:relative;overflow:hidden;}
+.loader-fill{position:absolute;left:0;top:0;height:100%;background:var(--red-bright);animation:lf 1.8s ease forwards;box-shadow:0 0 12px var(--red);}
+@keyframes lf{from{width:0}to{width:100%}}
+.loader-sub{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;}
+
+/* ── LAYOUT ── */
+main { position:relative;z-index:2; }
+
+section { min-height:100vh;position:relative; }
+
+/* ── NAV ── */
+nav {
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;
+  background:linear-gradient(to bottom,rgba(8,5,8,.97) 0%,transparent 100%);
+  border-bottom:1px solid transparent;
+  transition:border-color .3s;
+}
+nav.scrolled { border-color:var(--border); }
+.nav-logo { font-family:'Cinzel',serif;font-size:1.1rem;letter-spacing:.2em;color:var(--red-bright);text-decoration:none; }
+.nav-links { display:flex;gap:32px; }
+.nav-links a {
+  font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;
+}
+.nav-links a:hover { color:var(--red-bright); }
+
+/* ── HERO ── */
+#hero {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:0 24px;position:relative;overflow:hidden;
+}
+
+.hero-eyebrow {
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.4em;
+  color:var(--red-dim);text-transform:uppercase;margin-bottom:24px;
+  animation:fadeUp .8s ease 2s both;
+}
+
+.hero-name {
+  font-family:'Cinzel',serif;font-size:clamp(3.5rem,9vw,8rem);font-weight:900;
+  line-height:1;letter-spacing:.05em;
+  background:linear-gradient(135deg,#f5e8ea 0%,var(--red-bright) 40%,#8a1020 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:fadeUp .8s ease 2.2s both;
+  filter:drop-shadow(0 0 60px rgba(192,22,42,.3));
+}
+
+.hero-title {
+  font-size:1.1rem;font-weight:300;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--muted);margin-top:16px;
+  animation:fadeUp .8s ease 2.4s both;
+}
+.hero-title span { color:var(--red-bright); }
+
+.hero-desc {
+  max-width:560px;margin-top:28px;line-height:1.8;color:rgba(245,232,234,.5);
+  font-size:.95rem;font-weight:300;
+  animation:fadeUp .8s ease 2.6s both;
+}
+
+.hero-cta {
+  display:flex;gap:16px;margin-top:40px;
+  animation:fadeUp .8s ease 2.8s both;
+}
+.btn-primary {
+  background:var(--red);color:var(--text);padding:12px 32px;
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  border:none;border-radius:2px;cursor:pointer;text-decoration:none;
+  transition:background .2s,box-shadow .2s,transform .15s;
+  box-shadow:0 0 24px rgba(192,22,42,.3);
+}
+.btn-primary:hover { background:var(--red-bright);box-shadow:0 0 40px rgba(232,25,47,.5);transform:translateY(-2px); }
+.btn-outline {
+  background:transparent;color:var(--red-bright);padding:12px 32px;
+  font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;
+  border:1px solid var(--red-dim);border-radius:2px;cursor:pointer;text-decoration:none;
+  transition:all .2s;
+}
+.btn-outline:hover { border-color:var(--red-bright);background:var(--red-mist); }
+
+/* Scroll line */
+.scroll-line {
+  position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  animation:fadeUp .8s ease 3.2s both;
+}
+.scroll-line span { font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:.3em;color:var(--muted); }
+.scroll-line-bar { width:1px;height:48px;background:linear-gradient(to bottom,var(--red-bright),transparent);animation:scb 1.8s ease-in-out infinite; }
+@keyframes scb { 0%,100%{opacity:.3}50%{opacity:1} }
+
+/* ── SECTION COMMON ── */
+.sec-wrap { max-width:1100px;margin:0 auto;padding:100px 48px; }
+.sec-label {
+  font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:.4em;
+  text-transform:uppercase;color:var(--red-dim);margin-bottom:12px;display:flex;align-items:center;gap:12px;
+}
+.sec-label::after { content:'';flex:1;height:1px;background:var(--border); }
+.sec-title { font-family:'Cinzel',serif;font-size:clamp(2rem,4vw,3.2rem);font-weight:700;margin-bottom:48px;line-height:1.2; }
+.sec-title em { color:var(--red-bright);font-style:normal; }
+
+/* ── ABOUT ── */
+#about { background:var(--deep); }
+.about-grid { display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start; }
+.about-text p { line-height:1.9;color:rgba(245,232,234,.65);font-size:.95rem;font-weight:300;margin-bottom:16px; }
+.about-text p strong { color:var(--red-bright);font-weight:600; }
+
+.about-details { display:flex;flex-direction:column;gap:16px; }
+.detail-row { display:flex;align-items:center;gap:16px;padding:14px 20px;background:var(--surface);border:1px solid var(--border);border-radius:4px; }
+.detail-icon { width:32px;height:32px;border-radius:50%;background:var(--red-mist);border:1px solid var(--border-bright);display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0; }
+.detail-info { flex:1; }
+.detail-label { font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase; }
+.detail-value { font-size:.9rem;font-weight:600;color:var(--text);margin-top:2px; }
+
+/* Skills tags */
+.skills-wrap { margin-top:32px; }
+.skills-label { font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.25em;color:var(--muted);text-transform:uppercase;margin-bottom:12px; }
+.tags { display:flex;flex-wrap:wrap;gap:8px; }
+.tag {
+  padding:5px 14px;border:1px solid var(--border);border-radius:2px;
+  font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:.1em;
+  color:var(--muted);transition:all .2s;
+}
+.tag:hover { border-color:var(--red-bright);color:var(--red-bright);background:var(--red-mist); }
+
+/* ── PROJECTS ── */
+#projects { background:var(--bg); }
+.projects-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:24px; }
+
+.proj-card {
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  padding:32px;position:relative;overflow:hidden;
+  transition:border-color .3s,transform .3s,box-shadow .3s;
+  cursor:pointer;
+}
+.proj-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--red),transparent);
+  opacity:0;transition:opacity .3s;
+}
+.proj-card:hover { border-color:var(--border-bright);transform:translateY(-4px);box-shadow:0 20px 60px rgba(192,22,42,.15); }
+.proj-card:hover::before { opacity:1; }
+
+.proj-number {
+  font-family:'Cinzel',serif;font-size:3.5rem;font-weight:900;
+  color:rgba(192,22,42,.1);position:absolute;top:16px;right:24px;line-height:1;
+  transition:color .3s;
+}
+.proj-card:hover .proj-number { color:rgba(232,25,47,.2); }
+
+.proj-tag {
+  font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.25em;
+  text-transform:uppercase;color:var(--red-bright);margin-bottom:12px;display:block;
+}
+.proj-name {
+  font-family:'Cinzel',serif;font-size:1.5rem;font-weight:700;margin-bottom:12px;
+  line-height:1.2;color:var(--text);
+}
+.proj-desc { font-size:.85rem;line-height:1.7;color:rgba(245,232,234,.5);font-weight:300;margin-bottom:20px; }
+.proj-stack { display:flex;flex-wrap:wrap;gap:6px; }
+.proj-tech {
+  font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  padding:3px 10px;border:1px solid var(--border);border-radius:2px;color:var(--muted);
+}
+.proj-arrow {
+  position:absolute;bottom:24px;right:24px;width:32px;height:32px;
+  border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:.8rem;transition:all .2s;
+}
+.proj-card:hover .proj-arrow { border-color:var(--red-bright);color:var(--red-bright);background:var(--red-mist); }
+
+/* featured */
+.proj-card.featured { grid-column:span 2;display:grid;grid-template-columns:1fr 1fr;gap:32px; }
+.proj-card.featured .proj-name { font-size:2rem; }
+.proj-featured-badge {
+  display:inline-block;padding:3px 12px;background:var(--red-mist);border:1px solid var(--red-dim);
+  font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:.2em;color:var(--red-bright);
+  border-radius:2px;margin-bottom:12px;
+}
+.proj-visual {
+  background:linear-gradient(135deg,var(--surface) 0%,rgba(192,22,42,.05) 100%);
+  border:1px solid var(--border);border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:4rem;color:rgba(192,22,42,.2);
+  min-height:180px;position:relative;overflow:hidden;
+}
+.proj-visual-label {
+  font-family:'Cinzel',serif;font-size:1.4rem;color:rgba(192,22,42,.3);letter-spacing:.1em;
+}
+
+/* ── ACHIEVEMENTS ── */
+#achievements { background:var(--deep); }
+.ach-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:20px; }
+.ach-card {
+  background:var(--surface);border:1px solid var(--border);border-radius:4px;
+  padding:24px;transition:all .25s;position:relative;overflow:hidden;
+}
+.ach-card::after { content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--border);transition:background .25s; }
+.ach-card:hover { border-color:var(--border-bright);transform:translateY(-3px);box-shadow:0 12px 40px rgba(192,22,42,.1); }
+.ach-card:hover::after { background:var(--red-bright); }
+.ach-year { font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--red-bright);margin-bottom:8px; }
+.ach-icon { font-size:1.6rem;margin-bottom:12px; }
+.ach-name { font-family:'Cinzel',serif;font-size:1rem;font-weight:700;margin-bottom:6px;color:var(--text); }
+.ach-org { font-size:.8rem;color:var(--muted);font-weight:300; }
+
+/* IYC highlight */
+.ach-card.highlight {
+  border-color:var(--red-dim);
+  background:linear-gradient(135deg,var(--surface) 0%,rgba(192,22,42,.06) 100%);
+}
+.ach-card.highlight .ach-name { color:var(--red-bright); }
+
+/* ── 3D CANVAS SECTION ── */
+#model-section {
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;position:relative;overflow:hidden;
+}
+#three-canvas { position:absolute;inset:0;width:100%;height:100%; }
+.model-overlay {
+  position:relative;z-index:10;text-align:center;pointer-events:none;
+}
+.model-overlay-title {
+  font-family:'Cinzel',serif;font-size:clamp(1.2rem,2.5vw,1.8rem);font-weight:400;
+  letter-spacing:.3em;color:rgba(245,232,234,.3);text-transform:uppercase;
+  margin-bottom:8px;
+}
+.model-overlay-sub {
+  font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:.4em;
+  color:rgba(192,22,42,.5);text-transform:uppercase;
+}
+
+/* ── CONTACT / FOOTER ── */
+#contact { background:var(--deep);text-align:center; }
+.contact-inner { max-width:640px;margin:0 auto;padding:100px 48px; }
+.contact-inner .sec-label { justify-content:center; }
+.contact-inner .sec-label::after { display:none; }
+.contact-email {
+  font-family:'Cinzel',serif;font-size:clamp(1.5rem,3vw,2.5rem);
+  color:var(--text);margin:32px 0;display:block;text-decoration:none;
+  transition:color .2s;
+}
+.contact-email:hover { color:var(--red-bright); }
+.contact-desc { color:rgba(245,232,234,.4);font-size:.9rem;line-height:1.7;font-weight:300; }
+.social-links { display:flex;gap:20px;justify-content:center;margin-top:40px; }
+.social-link {
+  width:44px;height:44px;border:1px solid var(--border);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);text-decoration:none;font-size:.85rem;
+  transition:all .2s;
+}
+.social-link:hover { border-color:var(--red-bright);color:var(--red-bright);background:var(--red-mist); }
+
+footer {
+  border-top:1px solid var(--border);padding:24px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;z-index:2;
+}
+footer p { font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:.2em;color:var(--muted); }
+.footer-logo { font-family:'Cinzel',serif;font-size:.9rem;color:var(--red-bright);letter-spacing:.15em; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp { from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none} }
+.reveal { opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease; }
+.reveal.visible { opacity:1;transform:none; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--red-dim);border-radius:2px; }
+
+/* responsive */
+@media(max-width:768px){
+  .about-grid,.projects-grid,.ach-grid{grid-template-columns:1fr;}
+  .proj-card.featured{grid-column:span 1;display:block;}
+  nav{padding:16px 24px;}
+  .nav-links{display:none;}
+  .sec-wrap{padding:72px 24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-name">SMARAK</div>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <div class="loader-sub">Loading Portfolio...</div>
+</div>
+
+<!-- BG Canvas (particles) -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav id="nav">
+  <a class="nav-logo" href="#hero">SB</a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#projects">Projects</a>
+    <a href="#achievements">Achievements</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<main>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-eyebrow">Computer Engineering · Pokhara University · Nepal</div>
+  <h1 class="hero-name">SMARAK<br>BHANDARI</h1>
+  <p class="hero-title">Developer <span>·</span> Engineer <span>·</span> Builder</p>
+  <p class="hero-desc">Crafting intelligent systems — from autonomous robots to HR platforms and motion-driven experiences. Based in Gandaki, Nepal.</p>
+  <div class="hero-cta">
+    <a href="#projects" class="btn-primary">View Projects</a>
+    <a href="#contact" class="btn-outline">Get in Touch</a>
+  </div>
+  <div class="scroll-line">
+    <span>Scroll</span>
+    <div class="scroll-line-bar"></div>
+  </div>
+</section>
+
+<!-- ── 3D MODEL ── -->
+<section id="model-section">
+  <canvas id="three-canvas"></canvas>
+  <div class="model-overlay">
+    <div class="model-overlay-title">Interactive 3D Showcase</div>
+    <div class="model-overlay-sub">Drag to orbit · Scroll to zoom</div>
+  </div>
+</section>
+
+<!-- ── ABOUT ── -->
+<section id="about">
+  <div class="sec-wrap">
+    <div class="sec-label">01 &nbsp; About Me</div>
+    <h2 class="sec-title">Who I <em>Am</em></h2>
+    <div class="about-grid">
+      <div class="about-text">
+        <p>I am <strong>Smarak Bhandari</strong>, a Computer Engineering student at <strong>Gandaki College of Engineering and Science</strong>, Pokhara University. I build systems that solve real problems — from web platforms to physical robots.</p>
+        <p>My journey spans <strong>software development</strong>, <strong>embedded systems</strong>, and <strong>creative digital experiences</strong>. I enjoy bridging the gap between hardware and software, and between complexity and clarity.</p>
+        <p>Currently working on my major project <strong>KAM</strong> and the <strong>Mystic Motion</strong> experience, while continuously learning and collaborating with peers across disciplines.</p>
+        <div class="skills-wrap">
+          <div class="skills-label">Tech Stack</div>
+          <div class="tags">
+            <span class="tag">HTML / CSS / JS</span>
+            <span class="tag">PHP / Node.js</span>
+            <span class="tag">Python</span>
+            <span class="tag">Arduino</span>
+            <span class="tag">MySQL</span>
+            <span class="tag">React</span>
+            <span class="tag">Bootstrap</span>
+            <span class="tag">Git & GitHub</span>
+            <span class="tag">Embedded C</span>
+            <span class="tag">WordPress</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-details">
+        <div class="detail-row">
+          <div class="detail-icon">🎓</div>
+          <div class="detail-info">
+            <div class="detail-label">Degree</div>
+            <div class="detail-value">BE Computer Engineering</div>
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-icon">🏫</div>
+          <div class="detail-info">
+            <div class="detail-label">Institution</div>
+            <div class="detail-value">GCES, Pokhara University</div>
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-icon">📍</div>
+          <div class="detail-info">
+            <div class="detail-label">Location</div>
+            <div class="detail-value">Lamachaur, Kaski, Nepal</div>
+          </div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-icon">⚡</div>
+          <div class="detail-info">
+            <div class="detail-label">Focus</div>
+            <div class="detail-value">Web Dev · Robotics · AI</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROJECTS ── -->
+<section id="projects">
+  <div class="sec-wrap">
+    <div class="sec-label">02 &nbsp; Projects</div>
+    <h2 class="sec-title">What I've <em>Built</em></h2>
+    <div class="projects-grid">
+
+      <!-- Project 1: Work Nest -->
+      <div class="proj-card reveal">
+        <div class="proj-number">01</div>
+        <span class="proj-tag">◈ Minor Project · 2025</span>
+        <h3 class="proj-name">Work Nest</h3>
+        <p class="proj-desc">An integrated Human Resource Management System designed to automate core HR functions. Centralized platform for employee records, attendance, leave, payroll, and performance. 90% user acceptance rate in testing.</p>
+        <div class="proj-stack">
+          <span class="proj-tech">HTML/CSS/JS</span>
+          <span class="proj-tech">PHP</span>
+          <span class="proj-tech">MySQL</span>
+          <span class="proj-tech">Bootstrap</span>
+          <span class="proj-tech">Waterfall Model</span>
+        </div>
+        <div class="proj-arrow">→</div>
+      </div>
+
+      <!-- Project 2: Obstacle Avoidance Robot -->
+      <div class="proj-card reveal">
+        <div class="proj-number">02</div>
+        <span class="proj-tag">◈ Research Final · 2026</span>
+        <h3 class="proj-name">Obstacle Avoidance Robot</h3>
+        <p class="proj-desc">An autonomous robotic car using Arduino Uno and HC-SR04 ultrasonic sensor. Real-time obstacle detection, servo-based directional scanning, and intelligent motor control — 95% user satisfaction in testing.</p>
+        <div class="proj-stack">
+          <span class="proj-tech">Arduino Uno</span>
+          <span class="proj-tech">Embedded C</span>
+          <span class="proj-tech">HC-SR04</span>
+          <span class="proj-tech">L293D Motor Driver</span>
+          <span class="proj-tech">Servo</span>
+        </div>
+        <div class="proj-arrow">→</div>
+      </div>
+
+      <!-- Project 3: KAM (Major) -->
+      <div class="proj-card featured reveal">
+        <div>
+          <span class="proj-featured-badge">★ Major Project — Ongoing</span>
+          <span class="proj-tag">◈ 2025 – Present</span>
+          <h3 class="proj-name">KAM</h3>
+          <p class="proj-desc">A major engineering project currently in active development. KAM represents the culmination of skills across the full software development lifecycle — from requirements analysis and system design through to implementation and testing. Building for real-world impact.</p>
+          <div class="proj-stack">
+            <span class="proj-tech">Full Stack</span>
+            <span class="proj-tech">System Design</span>
+            <span class="proj-tech">Database</span>
+            <span class="proj-tech">In Progress</span>
+          </div>
+        </div>
+        <div class="proj-visual">
+          <div class="proj-visual-label">KAM</div>
+        </div>
+        <div class="proj-arrow">→</div>
+      </div>
+
+      <!-- Project 4: Mystic Motion -->
+      <div class="proj-card reveal" style="grid-column:span 2;">
+        <div class="proj-number">04</div>
+        <span class="proj-tag">◈ Creative Project · 2025</span>
+        <h3 class="proj-name">Mystic Motion</h3>
+        <p class="proj-desc">A motion-driven creative digital experience exploring the intersection of animation, interactivity, and visual storytelling. Mystic Motion pushes the boundaries of what web-based motion and design can achieve — fluid, immersive, and atmospheric.</p>
+        <div class="proj-stack">
+          <span class="proj-tech">JavaScript</span>
+          <span class="proj-tech">Three.js / WebGL</span>
+          <span class="proj-tech">CSS Animation</span>
+          <span class="proj-tech">Motion Design</span>
+          <span class="proj-tech">Creative Dev</span>
+        </div>
+        <div class="proj-arrow">→</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── ACHIEVEMENTS ── -->
+<section id="achievements">
+  <div class="sec-wrap">
+    <div class="sec-label">03 &nbsp; Achievements</div>
+    <h2 class="sec-title">Certifications &amp; <em>Awards</em></h2>
+    <div class="ach-grid">
+
+      <div class="ach-card reveal">
+        <div class="ach-year">2017</div>
+        <div class="ach-icon">⚜️</div>
+        <div class="ach-name">Scout of Thailand</div>
+        <div class="ach-org">International Scouting Recognition</div>
+      </div>
+
+      <div class="ach-card reveal">
+        <div class="ach-year">2019</div>
+        <div class="ach-icon">🏅</div>
+        <div class="ach-name">Duke of Edinburgh Award</div>
+        <div class="ach-org">International Youth Achievement</div>
+      </div>
+
+      <div class="ach-card reveal">
+        <div class="ach-year">2021</div>
+        <div class="ach-icon">📈</div>
+        <div class="ach-name">Organic Marketing</div>
+        <div class="ach-org">Coursera Certification</div>
+      </div>
+
+      <div class="ach-card reveal">
+        <div class="ach-year">2022</div>
+        <div class="ach-icon">🏆</div>
+        <div class="ach-name">English Olympiad</div>
+        <div class="ach-org">Academic Competition</div>
+      </div>
+
+      <div class="ach-card reveal">
+        <div class="ach-year">2025</div>
+        <div class="ach-icon">🌐</div>
+        <div class="ach-name">WordPress</div>
+        <div class="ach-org">Web Development Certification</div>
+      </div>
+
+      <div class="ach-card highlight reveal">
+        <div class="ach-year">2026</div>
+        <div class="ach-icon">🌍</div>
+        <div class="ach-name">IYC 2026</div>
+        <div class="ach-org">International Youth Conference</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="sec-label" style="justify-content:center;">04 &nbsp; Contact</div>
+    <h2 class="sec-title" style="text-align:center;">Let's <em>Connect</em></h2>
+    <p class="contact-desc">I'm always open to collaborating on interesting projects, research, or engineering challenges. Reach out — let's build something meaningful together.</p>
+    <a href="mailto:smaraknibor97@gmail.com" class="contact-email">smaraknibor97@gmail.com</a>
+    <div class="social-links">
+      <a href="https://www.linkedin.com/in/smarakbhandari/" target="_blank" class="social-link" title="LinkedIn">in</a>
+      <a href="mailto:smaraknibor97@gmail.com" class="social-link" title="Email">✉</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>© 2026 Smarak Bhandari · Computer Engineering · GCES Nepal</p>
+  <div class="footer-logo">SB</div>
+  <p>Built with passion &amp; code</p>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── CURSOR ──
+const cur = document.getElementById('cur');
+const ring = document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+setInterval(()=>{rx+=(mx-rx)*.16;ry+=(my-ry)*.16;ring.style.left=rx+'px';ring.style.top=ry+'px';},16);
+
+// ── LOADER ──
+setTimeout(()=>document.getElementById('loader').classList.add('out'),2000);
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll',()=>{
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// ── REVEAL ON SCROLL ──
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// ── BG PARTICLES ──
+(function(){
+  const canvas=document.getElementById('bg-canvas');
+  const ctx=canvas.getContext('2d');
+  let W=canvas.width=window.innerWidth,H=canvas.height=window.innerHeight;
+  window.addEventListener('resize',()=>{W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight;});
+  const N=120;
+  const pts=Array.from({length:N},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,
+    r:Math.random()*1.2+.3,
+  }));
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;
+      if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle='rgba(192,22,42,.35)';ctx.fill();
+    });
+    // connections
+    for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+      const d=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y);
+      if(d<110){
+        ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(192,22,42,${.08*(1-d/110)})`;ctx.lineWidth=.5;ctx.stroke();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── THREE.JS 3D MODEL ──
+(function(){
+  const canvas=document.getElementById('three-canvas');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(canvas.offsetWidth,canvas.offsetHeight);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.1;
+
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(50,canvas.offsetWidth/canvas.offsetHeight,.1,100);
+  camera.position.set(0,0,7);
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff,.15));
+  const l1=new THREE.PointLight(0xc0162a,5,20); l1.position.set(3,3,3); scene.add(l1);
+  const l2=new THREE.PointLight(0xff4060,3,18); l2.position.set(-3,-2,2); scene.add(l2);
+  const l3=new THREE.PointLight(0xffe0e0,1.5,15); l3.position.set(0,4,-2); scene.add(l3);
+
+  // Main mesh
+  const geo=new THREE.TorusKnotGeometry(1.4,.42,220,32);
+  const mat=new THREE.MeshStandardMaterial({color:0x1a0508,metalness:.95,roughness:.08,envMapIntensity:1});
+  const mesh=new THREE.Mesh(geo,mat);
+  scene.add(mesh);
+
+  // Wireframe overlay
+  const wireMat=new THREE.MeshBasicMaterial({color:0xc0162a,wireframe:true,opacity:.12,transparent:true});
+  const wire=new THREE.Mesh(geo,wireMat);
+  scene.add(wire);
+
+  // Orbit
+  let isDrag=false,prev={x:0,y:0},tx=0,ty=0,rx2=0,ry2=0,camZ=7;
+  canvas.addEventListener('mousedown',e=>{isDrag=true;prev={x:e.clientX,y:e.clientY};});
+  window.addEventListener('mouseup',()=>isDrag=false);
+  window.addEventListener('mousemove',e=>{
+    if(!isDrag) return;
+    tx+=(e.clientX-prev.x)*.007;
+    ty+=(e.clientY-prev.y)*.007;
+    prev={x:e.clientX,y:e.clientY};
+  });
+
+  // Zoom only when model section visible
+  const modelSec=document.getElementById('model-section');
+  window.addEventListener('wheel',e=>{
+    const rect=modelSec.getBoundingClientRect();
+    if(rect.top<window.innerHeight && rect.bottom>0){
+      camZ=Math.max(3,Math.min(14,camZ+e.deltaY*.01));
+    }
+  });
+
+  // Touch
+  let lt=null;
+  canvas.addEventListener('touchstart',e=>{lt=e.touches[0];});
+  canvas.addEventListener('touchmove',e=>{
+    if(!lt)return;
+    const t=e.touches[0];
+    tx+=(t.clientX-lt.clientX)*.007;
+    ty+=(t.clientY-lt.clientY)*.007;
+    lt=t;e.preventDefault();
+  },{passive:false});
+
+  window.addEventListener('resize',()=>{
+    const w=canvas.offsetWidth,h=canvas.offsetHeight;
+    renderer.setSize(w,h);
+    camera.aspect=w/h;camera.updateProjectionMatrix();
+  });
+
+  const clock=new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    const t=clock.getElapsedTime();
+    rx2+=(tx-rx2)*.06; ry2+=(ty-ry2)*.06;
+    mesh.rotation.y=ry2+t*.18;
+    mesh.rotation.x=rx2+Math.sin(t*.3)*.08;
+    wire.rotation.copy(mesh.rotation);
+    camera.position.z+=(camZ-camera.position.z)*.07;
+    l1.position.x=Math.sin(t*.6)*4;
+    l1.position.y=Math.cos(t*.4)*3;
+    l2.position.x=Math.cos(t*.5)*-3;
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
